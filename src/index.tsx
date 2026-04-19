@@ -4,7 +4,7 @@ import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
 import { ArticleParamsForm } from './components/article-params-form/ArticleParamsForm';
-import { defaultArticleState } from './constants/articleProps';
+import { defaultArticleState, ArticleStateType } from './constants/articleProps';
 
 import './styles/index.scss';
 import styles from './styles/index.module.scss';
@@ -14,26 +14,30 @@ const root = createRoot(domNode);
 
 const App = () => {
 	const [pageState, setPageState] = useState({
-		'--font-family': defaultArticleState.fontFamilyOption.value,
-		'--font-size': defaultArticleState.fontSizeOption.value,
-		'--font-color': defaultArticleState.fontColor.value,
-		'--container-width': defaultArticleState.contentWidth.value,
-		'--bg-color': defaultArticleState.backgroundColor.value,
+		fontFamilyOption: defaultArticleState.fontFamilyOption,
+		fontSizeOption: defaultArticleState.fontSizeOption,
+		fontColor: defaultArticleState.fontColor,
+		contentWidth: defaultArticleState.contentWidth,
+		backgroundColor: defaultArticleState.backgroundColor,
 	});
+
+	const handleStylesChange = (newStyles: ArticleStateType) => {
+		setPageState(newStyles);
+	}
 
 	return (
 		<main
 			className={clsx(styles.main)}
 			style={
 				{
-					'--font-family': defaultArticleState.fontFamilyOption.value,
-					'--font-size': defaultArticleState.fontSizeOption.value,
-					'--font-color': defaultArticleState.fontColor.value,
-					'--container-width': defaultArticleState.contentWidth.value,
-					'--bg-color': defaultArticleState.backgroundColor.value,
+					'--font-family': pageState.fontFamilyOption.value,
+					'--font-size': pageState.fontSizeOption.value,
+					'--font-color': pageState.fontColor.value,
+					'--container-width': pageState.contentWidth.value,
+					'--bg-color': pageState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm />
+			<ArticleParamsForm changeStyles={handleStylesChange}/>
 			<Article />
 		</main>
 	);

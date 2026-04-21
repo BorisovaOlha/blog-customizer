@@ -29,48 +29,56 @@ export const ArticleParamsForm = (props: ArticleFormProps) => {
 
 	useEffect(() => {
 		const handleOutsideClick = (e: MouseEvent) => {
-			if (modalRef && !modalRef.current?.contains(e.target)) {
+			if (modalRef.current && !modalRef.current?.contains(e.target as Node)) {
 				onClose();
 			}
 		};
-	}, []);
 
-	const [selectedFont, setSelectedFont] = useState<OptionType>(defaultArticleState.fontFamilyOption);
-	const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(defaultArticleState.fontSizeOption);
-	const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(defaultArticleState.fontColor);
-	const [selectedBackgroundColor, setSelectedBackgroundColor] = useState<OptionType>(defaultArticleState.backgroundColor);
-	const [selectedContentWidth, setSelectedContentWidth] = useState<OptionType>(defaultArticleState.contentWidth);
-	const handleFontSelect = (option: OptionType) => {
-		setSelectedFont(option);
-	};
-	const handleFontSizeSelect = (option: OptionType) => {
-		setSelectedFontSize(option);
-	};
-	const handleFontColorSelect = (option: OptionType) => {
-		setSelectedFontColor(option);
-	};
-	const handleBackgroundColorSelect = (option: OptionType) => {
-		setSelectedBackgroundColor(option);
-	};
-	const handleContentWidthSelect = (option: OptionType) => {
-		setSelectedContentWidth(option);
+		if (isOpen) {
+			document.addEventListener('mousedown', handleOutsideClick);
+		}
+
+		return () => {
+			document.removeEventListener('mousedown', handleOutsideClick);
+		};
+	}, [isOpen]);
+
+	const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
+
+	// const [selectedFont, setSelectedFont] = useState<OptionType>(defaultArticleState.fontFamilyOption);
+	// const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(defaultArticleState.fontSizeOption);
+	// const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(defaultArticleState.fontColor);
+	// const [selectedBackgroundColor, setSelectedBackgroundColor] = useState<OptionType>(defaultArticleState.backgroundColor);
+	// const [selectedContentWidth, setSelectedContentWidth] = useState<OptionType>(defaultArticleState.contentWidth);
+	// const handleFontSelect = (option: OptionType) => {
+	// 	setSelectedFont(option);
+	// };
+	// const handleFontSizeSelect = (option: OptionType) => {
+	// 	setSelectedFontSize(option);
+	// };
+	// const handleFontColorSelect = (option: OptionType) => {
+	// 	setSelectedFontColor(option);
+	// };
+	// const handleBackgroundColorSelect = (option: OptionType) => {
+	// 	setSelectedBackgroundColor(option);
+	// };
+	// const handleContentWidthSelect = (option: OptionType) => {
+	// 	setSelectedContentWidth(option);
+	// };
+
+	const handleSelect = (key: keyof ArticleStateType, option: OptionType) => {
+		setFormState((prevFormState) => {
+			return { ...prevFormState, [key]: option };
+		});
 	};
 
 	// const formState = {
-	// 	'--font-family': selectedFont?.value,
-	// 	'--font-size': selectedFontSize?.value,
-	// 	'--font-color': selectedFontColor?.value,
-	// 	'--container-width': selectedBackgroundColor?.value,
-	// 	'--bg-color': selectedContentWidth?.value,
+	// 	fontFamilyOption: selectedFont,
+	// 	fontSizeOption: selectedFontSize,
+	// 	fontColor: selectedFontColor,
+	// 	contentWidth: selectedContentWidth,
+	// 	backgroundColor: selectedBackgroundColor,
 	// };
-
-	const formState = {
-		fontFamilyOption: selectedFont,
-		fontSizeOption: selectedFontSize,
-		fontColor: selectedFontColor,
-		contentWidth: selectedContentWidth,
-		backgroundColor: selectedBackgroundColor,
-	};
 
 
 	const onStylesChange = (e: React.FormEvent) => {
@@ -78,48 +86,50 @@ export const ArticleParamsForm = (props: ArticleFormProps) => {
 		e.preventDefault();
 	};
 
+	const onClearForm = () => {
+		setFormState(defaultArticleState);
+		props.changeStyles(defaultArticleState);
+	};
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={handleFormClick} />
-			<aside className={clsx(styles.container, { [styles.container_open]: isOpen })} ref={modalRef}>
+			<aside
+				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				ref={modalRef}>
 				<form className={styles.form} onSubmit={onStylesChange}>
 					<Text as='h2' weight={800} size={31} uppercase>
 						Задайте параметры
 					</Text>
 					<Select
 						options={fontFamilyOptions}
-						onChange={handleFontSelect}
-						selected={selectedFont}
-						title='шрифт'>
-					</Select>
+						onChange={(option) => handleSelect('fontFamilyOption', option)}
+						selected={formState.fontFamilyOption}
+						title='шрифт'></Select>
 					<RadioGroup
 						name='fontSize'
 						options={fontSizeOptions}
-						selected={selectedFontSize}
-						onChange={handleFontSizeSelect}
-						title='Размер шрифта'>
-					</RadioGroup>
+						selected={formState.fontSizeOption}
+						onChange={(option) => handleSelect('fontSizeOption', option)}
+						title='Размер шрифта'></RadioGroup>
 					<Select
 						options={fontColors}
-						onChange={handleFontColorSelect}
-						selected={selectedFontColor}
-						title='Цвет шрифта'>
-					</Select>
+						onChange={(option) => handleSelect('fontColor', option)}
+						selected={formState.fontColor}
+						title='Цвет шрифта'></Select>
 					<Separator></Separator>
 					<Select
 						options={backgroundColors}
-						onChange={handleBackgroundColorSelect}
-						selected={selectedBackgroundColor}
-						title='Цвет фона'>
-					</Select>
+						onChange={(option) => handleSelect('backgroundColor', option)}
+						selected={formState.backgroundColor}
+						title='Цвет фона'></Select>
 					<Select
 						options={contentWidthArr}
-						onChange={handleContentWidthSelect}
-						selected={selectedContentWidth}
-						title='Ширина контента'>
-					</Select>
+						onChange={(option) => handleSelect('contentWidth', option)}
+						selected={formState.contentWidth}
+						title='Ширина контента'></Select>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
+						<Button title='Сбросить' htmlType='reset' type='clear' onClick={onClearForm} />
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>

@@ -23,7 +23,7 @@ const App = () => {
 
 	const handleStylesChange = (newStyles: ArticleStateType) => {
 		setPageState(newStyles);
-	}
+	};
 
 	return (
 		<main

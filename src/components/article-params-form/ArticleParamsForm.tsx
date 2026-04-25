@@ -2,13 +2,21 @@ import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
-import { defaultArticleState, fontFamilyOptions, fontSizeOptions, fontColors, contentWidthArr, backgroundColors, OptionType, ArticleStateType } from 'src/constants/articleProps';
+import {
+	defaultArticleState,
+	fontFamilyOptions,
+	fontSizeOptions,
+	fontColors,
+	contentWidthArr,
+	backgroundColors,
+	OptionType,
+	ArticleStateType,
+} from 'src/constants/articleProps';
 import { Separator } from 'src/ui/separator';
 import { Text } from 'src/ui/text';
 import styles from './ArticleParamsForm.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-
 
 type ArticleFormProps = {
 	changeStyles: (styles: ArticleStateType) => void;
@@ -17,7 +25,7 @@ type ArticleFormProps = {
 export const ArticleParamsForm = (props: ArticleFormProps) => {
 	const [isOpen, setOpen] = useState(false);
 
-	const handleFormClick = () => {
+	const handleArrowBtnClick = () => {
 		setOpen((isOpen) => !isOpen);
 	};
 
@@ -43,43 +51,14 @@ export const ArticleParamsForm = (props: ArticleFormProps) => {
 		};
 	}, [isOpen]);
 
-	const [formState, setFormState] = useState<ArticleStateType>(defaultArticleState);
-
-	// const [selectedFont, setSelectedFont] = useState<OptionType>(defaultArticleState.fontFamilyOption);
-	// const [selectedFontSize, setSelectedFontSize] = useState<OptionType>(defaultArticleState.fontSizeOption);
-	// const [selectedFontColor, setSelectedFontColor] = useState<OptionType>(defaultArticleState.fontColor);
-	// const [selectedBackgroundColor, setSelectedBackgroundColor] = useState<OptionType>(defaultArticleState.backgroundColor);
-	// const [selectedContentWidth, setSelectedContentWidth] = useState<OptionType>(defaultArticleState.contentWidth);
-	// const handleFontSelect = (option: OptionType) => {
-	// 	setSelectedFont(option);
-	// };
-	// const handleFontSizeSelect = (option: OptionType) => {
-	// 	setSelectedFontSize(option);
-	// };
-	// const handleFontColorSelect = (option: OptionType) => {
-	// 	setSelectedFontColor(option);
-	// };
-	// const handleBackgroundColorSelect = (option: OptionType) => {
-	// 	setSelectedBackgroundColor(option);
-	// };
-	// const handleContentWidthSelect = (option: OptionType) => {
-	// 	setSelectedContentWidth(option);
-	// };
+	const [formState, setFormState] =
+		useState<ArticleStateType>(defaultArticleState);
 
 	const handleSelect = (key: keyof ArticleStateType, option: OptionType) => {
 		setFormState((prevFormState) => {
 			return { ...prevFormState, [key]: option };
 		});
 	};
-
-	// const formState = {
-	// 	fontFamilyOption: selectedFont,
-	// 	fontSizeOption: selectedFontSize,
-	// 	fontColor: selectedFontColor,
-	// 	contentWidth: selectedContentWidth,
-	// 	backgroundColor: selectedBackgroundColor,
-	// };
-
 
 	const onStylesChange = (e: React.FormEvent) => {
 		props.changeStyles(formState);
@@ -93,7 +72,7 @@ export const ArticleParamsForm = (props: ArticleFormProps) => {
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={handleFormClick} />
+			<ArrowButton isOpen={isOpen} onClick={handleArrowBtnClick} />
 			<aside
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}
 				ref={modalRef}>
@@ -129,7 +108,12 @@ export const ArticleParamsForm = (props: ArticleFormProps) => {
 						selected={formState.contentWidth}
 						title='Ширина контента'></Select>
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' onClick={onClearForm} />
+						<Button
+							title='Сбросить'
+							htmlType='reset'
+							type='clear'
+							onClick={onClearForm}
+						/>
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>

@@ -19,101 +19,102 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 
 type ArticleFormProps = {
-	changeStyles: (styles: ArticleStateType) => void;
+	onApplyStyles: (styles: ArticleStateType) => void;
 };
 
 export const ArticleParamsForm = (props: ArticleFormProps) => {
-	const [isOpen, setOpen] = useState(false);
+	const [isFormOpen, setIsFormOpen] = useState(false);
 
 	const handleArrowBtnClick = () => {
-		setOpen((isOpen) => !isOpen);
+		setIsFormOpen((isFormOpen) => !isFormOpen);
 	};
 
-	const onClose = () => {
-		setOpen(false);
+	const handleCloseForm = () => {
+		setIsFormOpen(false);
 	};
 
 	const modalRef = useRef<HTMLElement>(null);
 
 	useEffect(() => {
+		if (!isFormOpen) return;
+
 		const handleOutsideClick = (e: MouseEvent) => {
 			if (modalRef.current && !modalRef.current?.contains(e.target as Node)) {
-				onClose();
+				handleCloseForm();
 			}
 		};
 
-		if (isOpen) {
-			document.addEventListener('mousedown', handleOutsideClick);
-		}
+		document.addEventListener('mousedown', handleOutsideClick);
 
 		return () => {
 			document.removeEventListener('mousedown', handleOutsideClick);
 		};
-	}, [isOpen]);
+	}, [isFormOpen]);
 
-	const [formState, setFormState] =
+	const [selectedStyles, setSelectedStyles] =
 		useState<ArticleStateType>(defaultArticleState);
 
 	const handleSelect = (key: keyof ArticleStateType, option: OptionType) => {
-		setFormState((prevFormState) => {
-			return { ...prevFormState, [key]: option };
+		setSelectedStyles((prevSelectedStyles) => {
+			return { ...prevSelectedStyles, [key]: option };
 		});
 	};
 
-	const onStylesChange = (e: React.FormEvent) => {
-		props.changeStyles(formState);
+	const handleApplyStyles = (e: React.FormEvent) => {
 		e.preventDefault();
+		props.onApplyStyles(selectedStyles);
 	};
 
-	const onClearForm = () => {
-		setFormState(defaultArticleState);
-		props.changeStyles(defaultArticleState);
+	const handleResetStyles = (e: React.FormEvent) => {
+		e.preventDefault();
+		setSelectedStyles(defaultArticleState);
+		props.onApplyStyles(defaultArticleState);
 	};
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={handleArrowBtnClick} />
+			<ArrowButton isOpen={isFormOpen} onClick={handleArrowBtnClick} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				className={clsx(styles.container, {
+					[styles.container_open]: isFormOpen,
+				})}
 				ref={modalRef}>
-				<form className={styles.form} onSubmit={onStylesChange}>
+				<form
+					className={styles.form}
+					onSubmit={handleApplyStyles}
+					onReset={handleResetStyles}>
 					<Text as='h2' weight={800} size={31} uppercase>
 						Задайте параметры
 					</Text>
 					<Select
 						options={fontFamilyOptions}
 						onChange={(option) => handleSelect('fontFamilyOption', option)}
-						selected={formState.fontFamilyOption}
+						selected={selectedStyles.fontFamilyOption}
 						title='шрифт'></Select>
 					<RadioGroup
 						name='fontSize'
 						options={fontSizeOptions}
-						selected={formState.fontSizeOption}
+						selected={selectedStyles.fontSizeOption}
 						onChange={(option) => handleSelect('fontSizeOption', option)}
 						title='Размер шрифта'></RadioGroup>
 					<Select
 						options={fontColors}
 						onChange={(option) => handleSelect('fontColor', option)}
-						selected={formState.fontColor}
+						selected={selectedStyles.fontColor}
 						title='Цвет шрифта'></Select>
 					<Separator></Separator>
 					<Select
 						options={backgroundColors}
 						onChange={(option) => handleSelect('backgroundColor', option)}
-						selected={formState.backgroundColor}
+						selected={selectedStyles.backgroundColor}
 						title='Цвет фона'></Select>
 					<Select
 						options={contentWidthArr}
 						onChange={(option) => handleSelect('contentWidth', option)}
-						selected={formState.contentWidth}
+						selected={selectedStyles.contentWidth}
 						title='Ширина контента'></Select>
 					<div className={styles.bottomContainer}>
-						<Button
-							title='Сбросить'
-							htmlType='reset'
-							type='clear'
-							onClick={onClearForm}
-						/>
+						<Button title='Сбросить' htmlType='reset' type='clear' />
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
